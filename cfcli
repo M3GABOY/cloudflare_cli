@@ -1,0 +1,63 @@
+#!/bin/sh
+while getopts t:z:o:n:6:4:m:k:i: flag
+do
+    case "${flag}" in
+        t) token=${OPTARG};;
+        z) zone=${OPTARG};;
+        o) option=${OPTARG};;
+        n) name=${OPTARG};;
+        6) v6=${OPTARG};;
+        4) v4=${OPTARG};;
+        m) mail=${OPTARG};;
+        k) key=${OPTARG};;
+        i) id=${OPTARG};;
+    esac
+done
+
+ipv6off()
+{
+    curl -X PATCH "https://api.cloudflare.com/client/v4/zones/${zone}/settings/ipv6" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Content-Type: application/json" \
+        --data '{"value":"off"}'
+}
+
+ipv6on()
+{
+    curl -X PATCH "https://api.cloudflare.com/client/v4/zones/${zone}/settings/ipv6" \
+        -H "Authorization: Bearer ${token}" \
+        -H "Content-Type: application/json" \
+        --data '{"value":"on"}'
+}
+
+set_dns_v4()
+{
+    curl -X PUT "https://api.cloudflare.com/client/v4/zones/${zone}/dns_records/${id}" \
+        -H "X-Auth-Email: ${mail}" \
+        -H "X-Auth-Key: ${key}" \
+        -H "Content-Type: application/json" \
+        --data '{"type":"A","name":"${name}","content":"${v4}","ttl":10,"proxied":false}'
+}
+
+set_dns_v6()
+{
+    curl -X PUT "https://api.cloudflare.com/client/v4/zones/${zone}/dns_records/${id}" \
+        -H "X-Auth-Email: ${mail}" \
+        -H "X-Auth-Key: ${key}" \
+        -H "Content-Type: application/json" \
+        --data '{"type":"AAAA","name":"${name}","content":"${v6}","ttl":10,"proxied":false}'
+}
+
+printhelp()
+{
+    echo "Usage: cfcli [-o] option [-t] token [-z] zone [-n] record_name [-6] ipv6 [-4] ipv4 [-i] user_id [-k] xauth_key [-m] xauth_mail"
+    echo "Options: ipv6on | ipv6off | setv4 | setv6 | help"
+}
+
+case "${option}" in
+    ipv6on) ipv6on;;
+    ipv6off) ipv6of;;
+    setv4) set_dns_v4;;
+    setv6) set_dns_v6;;
+    help) printhelp;
+esac
