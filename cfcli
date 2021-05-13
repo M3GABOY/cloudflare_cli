@@ -56,7 +56,7 @@ printhelp()
 
 case "${option}" in
     ipv6on) ipv6on;;
-    ipv6off) ipv6of;;
+    ipv6off) ipv6off;;
     setv4) set_dns_v4;;
     setv6) set_dns_v6;;
     help) printhelp;
