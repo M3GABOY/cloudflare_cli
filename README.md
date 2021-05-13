@@ -18,3 +18,8 @@ setv6: Set AAAA record
 
 help: Print help message
 ```
+# Example
+```
+Disabling IPv6:
+
+/PATH_TO_SCRIPT/cfcli -o ipv6off -z "<zone_id>" -t "<token>"
